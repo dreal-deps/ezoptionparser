@@ -21,7 +21,7 @@ html:
 	cp ezOptionParser.hpp html
 
 install:
-	cp ezOptionParser.hpp $(PREFIX)/include
+	cp ezOptionParser.hpp $(PREFIX)/include/ezOptionParser/
 
 memtest:
 	cd examples && $(MAKE) memtest
