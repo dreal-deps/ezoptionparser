@@ -833,7 +833,7 @@ bool ezOptionValidator::isValid(const std::string * valueAsString) {
   } \
   \
   /* Check if within user's custom range. */ \
-  T v0, v1; \
+  T v0{}, v1{}; \
   if (size > 0) { \
     v0 = LIST[0]; \
   } \
