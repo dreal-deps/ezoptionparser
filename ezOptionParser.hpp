@@ -50,19 +50,6 @@ static T fromString(const char* s) {
   return t;
 }
 /* ################################################################### */
-static inline bool isdigit(const std::string & s, int i=0) {
-  int n = s.length();
-  for(; i < n; ++i)
-    switch(s[i]) {
-      case '0': case '1': case '2':
-      case '3': case '4': case '5':
-      case '6': case '7': case '8': case '9': break;
-      default: return false;
-    }
-    
-  return true;
-}
-/* ################################################################### */
 static bool isdigit(const std::string * s, int i=0) {
   int n = s->length();
   for(; i < n; ++i)
