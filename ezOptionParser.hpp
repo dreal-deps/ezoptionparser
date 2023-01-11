@@ -15,6 +15,7 @@ v0.2.0 20121120 Added parseIndex to OptionGroup.
 v0.2.1 20130506 Allow disabling doublespace of OPTIONS usage descriptions.
 v0.2.2 20140504 Jose Santiago added compiler warning fixes.
                 Bruce Shankle added a crash fix in description printing.
+v0.2.2 20230111 Soonho Kong replaced sprintf with snprintf.
 */
 #ifndef EZ_OPTION_PARSER_H
 #define EZ_OPTION_PARSER_H
@@ -30,6 +31,7 @@ v0.2.2 20140504 Jose Santiago added compiler warning fixes.
 #include <limits>
 #include <sstream>
 #include <cstring>
+#include <exception>
 
 namespace ez {
 #define DEBUGLINE() printf("%s:%d\n", __FILE__, __LINE__);
@@ -2071,11 +2073,15 @@ void ezOptionParser::parse(int argc, const char * argv[]) {
 /* ################################################################### */
 void ezOptionParser::prettyPrint(std::string & out) {
   char tmp[256];
+  int r = -1;  // To check the return value of snprintf;
   int i,j,k;
   
   out += "First Args:\n";
   for(i=0; i < (long int)firstArgs.size(); ++i) {
-    sprintf(tmp, "%d: %s\n", i+1, firstArgs[i]->c_str());
+    r = snprintf(tmp, sizeof(tmp), "%d: %s\n", i+1, firstArgs[i]->c_str());
+    if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+      throw std::runtime_error("Buffer Overflow.");
+    }
     out += tmp;
   }
 
@@ -2096,46 +2102,73 @@ void ezOptionParser::prettyPrint(std::string & out) {
     out += "\n";
     // The flag names:
     for(j=0; j < (long int)g->flags.size()-1; ++j) {
-      sprintf(tmp, "%s, ", g->flags[j]->c_str());
+      r = snprintf(tmp, sizeof(tmp), "%s, ", g->flags[j]->c_str());
+      if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+        throw std::runtime_error("Buffer Overflow.");
+      }
       out += tmp;
     }
-    sprintf(tmp, "%s:\n", g->flags.back()->c_str());
+    r = snprintf(tmp, sizeof(tmp), "%s:\n", g->flags.back()->c_str());
+    if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+      throw std::runtime_error("Buffer Overflow.");
+    }
     out += tmp;
 
     if (g->isSet) {
       if (g->expectArgs) {
         if (g->args.empty()) {
-          sprintf(tmp, "%s (default)\n", g->defaults.c_str());
+          r = snprintf(tmp, sizeof(tmp), "%s (default)\n", g->defaults.c_str());
+          if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+            throw std::runtime_error("Buffer Overflow.");
+          }
           out += tmp;
         } else {
           for(k=0; k < (long int)g->args.size(); ++k) {            
             for(j=0; j < (long int)g->args[k]->size()-1; ++j) {
-              sprintf(tmp, "%s%c", g->args[k]->at(j)->c_str(), g->delim);
+              r = snprintf(tmp, sizeof(tmp), "%s%c", g->args[k]->at(j)->c_str(), g->delim);
+              if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+                throw std::runtime_error("Buffer Overflow.");
+              }
               out += tmp;
             }
-            sprintf(tmp, "%s\n", g->args[k]->back()->c_str());
+            r = snprintf(tmp, sizeof(tmp), "%s\n", g->args[k]->back()->c_str());
+            if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+              throw std::runtime_error("Buffer Overflow.");
+            }
             out += tmp;
           }
         }
       } else { // Set but no args expected.
-        sprintf(tmp, "Set\n");
+        r = snprintf(tmp, sizeof(tmp), "Set\n");
+        if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+          throw std::runtime_error("Buffer Overflow.");
+        }
         out += tmp;
       }
     } else {
-      sprintf(tmp, "Not set\n");
+      r = snprintf(tmp, sizeof(tmp), "Not set\n");
+      if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+        throw std::runtime_error("Buffer Overflow.");
+      }
       out += tmp;
     }
   }
   
   out += "\nLast Args:\n";
   for(i=0; i < (long int)lastArgs.size(); ++i) {
-    sprintf(tmp, "%d: %s\n", i+1, lastArgs[i]->c_str());
+    r = snprintf(tmp, sizeof(tmp), "%d: %s\n", i+1, lastArgs[i]->c_str());
+    if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+      throw std::runtime_error("Buffer Overflow.");
+    }
     out += tmp;
   }
   
   out += "\nUnknown Args:\n";
   for(i=0; i < (long int)unknownArgs.size(); ++i) {
-    sprintf(tmp, "%d: %s\n", i+1, unknownArgs[i]->c_str());
+    r = snprintf(tmp, sizeof(tmp), "%d: %s\n", i+1, unknownArgs[i]->c_str());
+    if (r < 0 || static_cast<size_t>(r) > sizeof(tmp)) {
+      throw std::runtime_error("Buffer Overflow.");
+    }
     out += tmp;
   }
 }
